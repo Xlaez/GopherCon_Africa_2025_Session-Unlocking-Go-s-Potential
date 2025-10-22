@@ -64,7 +64,8 @@ func (s *Scheduler) NewG(f func()) *G {
 	return &G{
 		ID:     id,
 		Func:   f,
-		Status: "runnable", // In the real-world we'll favour using enums over direct strings for status
+		// In the real-world we'll favour using enums over direct strings for status
+		Status: "runnable", 
 	}
 }
 

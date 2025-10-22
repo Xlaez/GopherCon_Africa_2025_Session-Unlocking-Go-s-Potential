@@ -304,3 +304,43 @@ func main() {
 	// Give time for resume (loop already runs, but wait for full finish).
 	time.Sleep(1 * time.Second)
 }
+
+/*
+Why was there a deadlock?
+
+1. sched.Run() starts.
+
+2. M0 runs G0. g0.Run() is called and completes.
+
+3. M1 runs G1. g1.Run() is called and completes.
+
+4. The scheduler loop (sched.Run()) continues. P0 still has G2. It binds an idle M (M0) to P0.
+
+5. M0 calls Schedule() on G2.
+
+6. It prints M0 on P0: Starting G2.
+
+7. It enters the if g.blockChan != nil block.
+
+8. It prints G2: Blocking (e.g., I/O wait)....
+
+9. It detaches P, adds itself to idleMs, and sleeps for 1 second.
+
+10. It wakes up, prints G2: Unblocked!, and returns from Schedule().
+
+11. g2.Run() was never called. G2's function (sampleWork3) never ran.
+
+12. The sched.Run() loop continues. All processor queues (P0, P1) are now empty.
+
+13. s.done is set to true, the loop terminates, and sched.Run() prints === Schedule Complete === and returns.
+
+14. Execution returns to main().
+
+15. main() sleeps for 500ms.
+
+16. main() tries to send on g2.blockChan at g2.blockChan <- struct{}{}.
+
+17. Since g2.Run() was never called, no goroutine is waiting to receive from that channel.
+
+18. Deadlock: main is blocked forever.
+*/

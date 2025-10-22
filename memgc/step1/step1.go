@@ -16,7 +16,7 @@ func main() {
 		_ = make([]byte, 64)
 	}
 
-	// Force a GC for demo (avoid in prod!)
+	// Force a GC for demo
 	runtime.GC()
 
 	runtime.ReadMemStats(&m)
@@ -30,4 +30,9 @@ Reads initial heap size.
 Allocates 1M tiny slices (~64MB total) – this grows the heap and likely triggers GC.
 Forces a GC
 Prints final stats.
+*/
+
+/*
+What did you notice?
+The heap size was not actually affected because the GC is so smart and it performs an escape analysis
 */

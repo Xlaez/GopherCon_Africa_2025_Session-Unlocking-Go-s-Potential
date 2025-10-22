@@ -185,3 +185,8 @@ func main() {
 
 	fmt.Println("=== Schedule Complete ===")
 }
+
+/*
+Question:  Why did the logs not contain all the expected results?
+- 
+*/

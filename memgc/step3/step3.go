@@ -80,3 +80,12 @@ func main() {
 	printMem("Final")
 	fmt.Printf("Total run: %v\n", totalDur)
 }
+
+/**
+What this does:
+
+Simulates "processing" 10k small int slices into string slices (e.g., like JSON building).
+Escaping: Each processDataEscaping allocs heap slice, returns ptr → 10k heap allocs + appends → GC triggers.
+Stack: Uses fixed array (stack), returns slice view → copies on return (stack in caller if fits), fewer heap hits.
+Prints heap/Mallocs (total allocs ever—rises with escapes) per phase.
+*/
